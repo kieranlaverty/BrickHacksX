@@ -25,19 +25,33 @@ with mp_holistic.Holistic(min_detection_confidence = .5, min_tracking_confidence
       
       RGB_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
       result = hand.process(RGB_frame)
-      if result.multi_hand_landmarks:
+      """if result.multi_hand_landmarks:
          for hand_landmarks in result.multi_hand_landmarks:
             mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-            mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-            
+            mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)"""
+      #right hand
+      mp_drawing.draw_landmarks(frame, holistic.process(RGB_frame).right_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
+            mp_drawing.DrawingSpec(color=(80,22,10), thickness=2, circle_radius=4),
+            mp_drawing.DrawingSpec(color=(80,44,121), thickness=2, circle_radius=2)
+            )
+
+      #Left Hand
+      mp_drawing.draw_landmarks(frame, holistic.process(RGB_frame).left_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
+            mp_drawing.DrawingSpec(color=(12,22,76), thickness=2, circle_radius=4),
+            mp_drawing.DrawingSpec(color=(12,44,250), thickness=2, circle_radius=2)
+            )
+
+      #faces
       mp_drawing.draw_landmarks(frame, holistic.process(RGB_frame).face_landmarks, mp_holistic.FACEMESH_TESSELATION, 
             mp_drawing.DrawingSpec(color=(80,110,10), thickness=1, circle_radius=1),
             mp_drawing.DrawingSpec(color=(80,256,121), thickness=1, circle_radius=1)
             )
+      
+      #poses
       mp_drawing.draw_landmarks(frame, holistic.process(RGB_frame).pose_landmarks, mp_holistic.POSE_CONNECTIONS, 
-                                 mp_drawing.DrawingSpec(color=(245,117,66), thickness=2, circle_radius=4),
-                                 mp_drawing.DrawingSpec(color=(245,66,230), thickness=2, circle_radius=2)
-                                 )
+            mp_drawing.DrawingSpec(color=(245,117,66), thickness=2, circle_radius=4),
+            mp_drawing.DrawingSpec(color=(245,66,230), thickness=2, circle_radius=2)
+            )
       img = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
       cv.imshow('frame', img)
       #file.write(img)
