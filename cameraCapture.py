@@ -25,7 +25,7 @@ while True:
    result = hand.process(RGB_frame)
    if result.multi_hand_landmarks:
       for hand_landmarks in result.multi_hand_landmarks:
-         mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.hand_connections)
+         mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
    
    img = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
    cv.imshow('frame', img)
