@@ -218,6 +218,9 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
                         fontScale, color, thickness, cv.LINE_AA)
         
 
+        #scaled the image by 2
+        height, width = image.shape[:2]
+        image = cv.resize(image,(2*width, int(1.5*height)), interpolation = cv.INTER_CUBIC)
 
         cv.imshow('camera', image)
          
