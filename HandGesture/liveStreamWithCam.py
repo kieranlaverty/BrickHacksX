@@ -171,7 +171,11 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
                     print("Incorrect.")
                 midQuestion = False
 
+        
+        #flipping the camera feed
         frame = cv.flip(frame, 1)
+
+        #added_image = cv2.addWeighted(background,0.4,overlay,0.1,0)
         # display recognized gesture on screen
         org = (50, 50) 
         fontScale = 1
@@ -184,6 +188,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
 
         # display question on screen
         question = "What is thekkjkkkkkkkkkkkkkkxx wing span of a swallow?"
+
         #text placement
         org = (0, 450) 
 
@@ -195,17 +200,20 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
                 scale = scale/10
                 break
 
-        upperLeftTextOriginX = int(100 * 0.05)
-        upperLeftTextOriginY = int(100 * 0.05)
         fontScale = min(200,30)/(25/scale)
 
+        #text color
         color = (255, 0, 0) 
 
+        #thickness
         thickness = 2
         
+        #overlay text
         image = cv.putText(frame, question, org, cv.FONT_HERSHEY_SIMPLEX ,  
                         fontScale, color, thickness, cv.LINE_AA)
         
+
+
         cv.imshow('camera', image)
          
         if cv.waitKey(1) == ord('q'):
