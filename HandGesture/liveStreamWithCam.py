@@ -77,6 +77,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
     questionNumber = 0
     midQuestion = False
     correct_answers = 0
+    
 
     #set up trivia variables
     response = requests.get(API_URL)
@@ -124,6 +125,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
                     questionNumber = 0
                     midQuestion = False
                     correct_answers = 0
+                    bottom_text = 'Gesture to Start!'
 
         #game logic
         if currentGameState == 'main' and loadQuestions == True:
@@ -146,6 +148,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
             # ask a question
             question = questions[questionNumber]
             print(question["question"])
+            bottom_text = question["question"]
             print('(thumbs-up) true')
             print('(thumbs-down) false')
             
@@ -186,7 +189,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
         fontScale = 1
         color = (255, 0, 0) 
         thickness = 2
-        outText = 'game: ' + currentGameState + '    controlState:' + currentGestureState +  'current: ' + title
+        outText = currentGameState + '    ' + title
         image = cv.putText(frame, outText, org, cv.FONT_HERSHEY_SIMPLEX ,  
                         fontScale, color, thickness, cv.LINE_AA) 
         
