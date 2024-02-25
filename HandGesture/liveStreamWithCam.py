@@ -146,39 +146,35 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
             # ask a question
             question = questions[questionNumber]
             print(question["question"])
-            question = question["question"]
-            print("Options:")
-            gestureChoices = {0: "thumbs-down", 1: "thumbs-up"}
-            for i in range(len(question["incorrect_answers"])):
-                print(f"({gestureChoices[i]}) {question['incorrect_answers'][i]}")
-
-            #print(f"{len(question['incorrect_answers'])+1}. {question['correct_answer']}")
+            print('(thumbs-up) true')
+            print('(thumbs-down) false')
+            
             questionNumber = questionNumber + 1
 
-            # resset currentGameState
-            pass
 
         if midQuestion:
             if 'Thumb_Up' in currentGestureState:
-                user_answer = 2
-                if user_answer == len(question["incorrect_answers"]) + 1:
+                user_answer = 'True'
+                print('You said True')
+                if user_answer == question["correct_answer"]:
                     print("Correct!")
                     correct_answers += 1
                 else:
                     print("Incorrect.")
                 midQuestion = False
                 currentGestureState = ''
-                currentGestureStateCount = -50 # to let state reset
+                currentGestureStateCount = 0 # to let state reset
             if 'Thumb_Down' in currentGestureState:
-                user_answer = 1
-                if user_answer == len(question["incorrect_answers"]) + 1:
+                user_answer = 'False'
+                print('You said False')
+                if user_answer == question["correct_answer"]:
                     print("Correct!")
                     correct_answers += 1
                 else:
                     print("Incorrect.")
                 midQuestion = False
                 currentGestureState = ''
-                currentGestureStateCount = -50 # to let state reset
+                currentGestureStateCount = 0 # to let state reset
 
         
         #flipping the camera feed
