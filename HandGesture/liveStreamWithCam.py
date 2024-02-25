@@ -21,6 +21,8 @@ VisionRunningMode = mp.tasks.vision.RunningMode
 mp_holistic = mp.solutions.holistic
 mp_drawing = mp.solutions.drawing_utils
 
+bottom_text = "          holder"
+
 globalResult = None
 # Create a gesture recognizer instance with the live stream mode:
 def print_result(result: GestureRecognizerResult, output_image: mp.Image, timestamp_ms: int):
@@ -144,6 +146,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
             # ask a question
             question = questions[questionNumber]
             print(question["question"])
+            question = question["question"]
             print("Options:")
             gestureChoices = {0: "thumbs-down", 1: "thumbs-up"}
             for i in range(len(question["incorrect_answers"])):
@@ -192,15 +195,12 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
                         fontScale, color, thickness, cv.LINE_AA) 
         
 
-        # display question on screen
-        question = "What is thekkjkkkkkkkkkkkkkkxx wing span of a swallow?"
-
         #text placement
         org = (0, 450) 
 
         #setting text scaling
         for scale in reversed(range(0, 60, 1)):
-            textSize = cv.getTextSize(question, fontFace=cv.FONT_HERSHEY_DUPLEX, fontScale=scale/10, thickness=1)
+            textSize = cv.getTextSize(bottom_text, fontFace=cv.FONT_HERSHEY_DUPLEX, fontScale=scale/10, thickness=1)
             new_width = textSize[0][0]
             if (new_width <= 500):
                 scale = scale/10
@@ -215,7 +215,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
         thickness = 2
         
         #overlay text
-        image = cv.putText(frame, question, org, cv.FONT_HERSHEY_SIMPLEX ,  
+        image = cv.putText(frame, bottom_text, org, cv.FONT_HERSHEY_SIMPLEX ,  
                         fontScale, color, thickness, cv.LINE_AA)
         
 
