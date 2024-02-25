@@ -1,5 +1,5 @@
 import threading
-
+import time
 import cv2 as cv
 
 import mediapipe as mp
@@ -11,25 +11,44 @@ base_options = python.BaseOptions(model_asset_path='HandGesture\\gesture_recogni
 options = vision.GestureRecognizerOptions(base_options=base_options)
 recognizer = vision.GestureRecognizer.create_from_options(options)
 
+BaseOptions = mp.tasks.BaseOptions
+GestureRecognizer = mp.tasks.vision.GestureRecognizer
+GestureRecognizerOptions = mp.tasks.vision.GestureRecognizerOptions
+GestureRecognizerResult = mp.tasks.vision.GestureRecognizerResult
+VisionRunningMode = mp.tasks.vision.RunningMode
+
+def current_milli_time():
+    return round(time.time() * 1000)
+
+def print_result(result: GestureRecognizerResult, output_image: mp.Image, timestamp_ms: int):
+    if result is not None:
+        print('gesture recognition result: {}'.format(result.gestures))
+    return result
+
+
+
 
 def gest(frame):
-        
-        
-    rgb_frame = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
+   options = GestureRecognizerOptions(
+   base_options=BaseOptions(model_asset_path='HandGesture\\gesture_recognizer.task'),
+   running_mode=VisionRunningMode.LIVE_STREAM,
+   result_callback=print_result) 
+   recognizer = vision.GestureRecognizer.create_from_options(options)
+   with GestureRecognizer.create_from_options(options) as recognizer:
+    
+                  
+      rgb_frame = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
 
-    recognition_result = recognizer.recognize(rgb_frame)
+      #asyncio.run(recognizer.recognize_async(rgb_frame, current_milli_time()))
 
-    try:
-        top_gesture = recognition_result.gestures[0][0]
-    except IndexError:
 
-        top_gesture = None
+      thread = threading.Thread(target=recognizer.recognize_async, args=(rgb_frame, current_milli_time()))
+      thread.start()
 
-    hand_landmarks = recognition_result.hand_landmarks
+      # Continue with other tasks while processing is happening asynchronously
 
-    if top_gesture:
-        title = f"{top_gesture.category_name} ({top_gesture.score:.2f})"
-        print(title)
+      # Wait for the asynchronous processing to finish
+      thread.join()
 
 
 
