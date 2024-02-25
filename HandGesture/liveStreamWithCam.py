@@ -106,8 +106,10 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
                     currentGameState = 'play'
 
         #game logic
-        (if currentGameState is 'main' and previousGameState is 'play')
+        if (currentGameState is 'main' and previousGameState is 'play'):
+            pass
         if(currentGameState is 'play'):
+            pass
             # ask a question
             # resset currentGameState
 
