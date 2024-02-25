@@ -3,6 +3,13 @@ import cv2 as cv
 import time
 import threading
 
+#trivia
+import json
+import requests
+
+
+
+
 def current_milli_time():
     return round(time.time() * 1000)
 
@@ -68,7 +75,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
             break
             
         getGesture(recognizer=recognizer, frame=frame)
-        printHandOutline(holisitic=holistic, frame=frame)
+        #printHandOutline(holisitic=holistic, frame=frame)
 
 
         if(globalResult is not None and len(globalResult.gestures) != 0):
