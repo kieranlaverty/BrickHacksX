@@ -171,7 +171,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
                     print("Incorrect.")
                 midQuestion = False
 
-
+        frame = cv.flip(frame, 1)
         # display recognized gesture on screen
         org = (50, 50) 
         fontScale = 1
@@ -184,17 +184,23 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
 
         # display question on screen
         question = "What is thekkjkkkkkkkkkkkkkkxx wing span of a swallow?"
+        #text placement
         org = (0, 450) 
+
+        #setting text scaling
         for scale in reversed(range(0, 60, 1)):
             textSize = cv.getTextSize(question, fontFace=cv.FONT_HERSHEY_DUPLEX, fontScale=scale/10, thickness=1)
             new_width = textSize[0][0]
             if (new_width <= 500):
                 scale = scale/10
                 break
+
         upperLeftTextOriginX = int(100 * 0.05)
         upperLeftTextOriginY = int(100 * 0.05)
         fontScale = min(200,30)/(25/scale)
+
         color = (255, 0, 0) 
+
         thickness = 2
         
         image = cv.putText(frame, question, org, cv.FONT_HERSHEY_SIMPLEX ,  
