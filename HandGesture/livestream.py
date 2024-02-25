@@ -2,7 +2,6 @@ import mediapipe as mp
 import cv2 as cv
 import time
 import threading
-import asyncio
 
 def current_milli_time():
     return round(time.time() * 1000)

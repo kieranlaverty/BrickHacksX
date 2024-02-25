@@ -25,7 +25,8 @@ globalResult = None
 # Create a gesture recognizer instance with the live stream mode:
 def print_result(result: GestureRecognizerResult, output_image: mp.Image, timestamp_ms: int):
     if result is not None:
-        print('gesture recognition result: {}'.format(result.gestures))
+        #print('gesture recognition result: {}'.format(result.gestures))
+        pass
     global globalResult
     globalResult = result
 
@@ -36,7 +37,7 @@ def getGesture(recognizer, frame):
     thread.start()
     thread.join()
 
-    print(globalResult)
+    #print(globalResult)
 
 def printHandOutline(holisitic, frame):
     RGB_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
@@ -68,7 +69,9 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
     previousGestureState = ''
     previousGameState = 'Main'
     currentGameState = 'Main'
+    loadQuestions = True
     showMesh = True
+    questionNumber = 0
 
     cam = cv.VideoCapture(0)
     
@@ -94,6 +97,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
         if top_gesture:
             title = f"{top_gesture.category_name} ({top_gesture.score:.2f})"
         
+        #get current Gesture
         if title != '' and previousGestureState != title:
             #make sure it is the right option
             currentGestureStateCount = currentGestureStateCount + 1
@@ -102,14 +106,45 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
                 previousGestureState = title
                 if 'Pointing_Up' in title:
                     showMesh = not showMesh
-                if 'I_Love_You' in title:
+                if 'ILoveYou' in title:
                     currentGameState = 'play'
+                if 'Victory' in title:
+                    currentGameState = 'main'
 
         #game logic
-        (if currentGameState is 'main' and previousGameState is 'play')
+        if currentGameState == 'main' and loadQuestions == True:
+            #load up the questions for the next game
+            response = requests.get(API_URL)
+            data = json.loads(response.text)
+            questions = data["results"]
+            print(questions)
+            loadQuestions = False
+            questionNumber = 0
+            correct_answers = 0
+            questions = data["results"]
+
+
         if(currentGameState is 'play'):
+            loadQuestions = True
             # ask a question
+            question = questions[questionNumber]
+            print(question["question"])
+            print("Options:")
+            for i in range(len(question["incorrect_answers"])):
+                print(f"{i+1}. {question['incorrect_answers'][i]}")
+
+            # print(f"(Thumbs-up): {question['incorrect_answers'][0]}")
+            # print(f"(Thumbs-down): {question['incorrect_answers'][1]}")
+            print(f"{len(question['incorrect_answers'])+1}. {question['correct_answer']}")
+            user_answer = int(input("Enter the number of your answer: "))
+            if user_answer == len(question["incorrect_answers"]) + 1:
+                print("Correct!")
+                correct_answers += 1
+            else:
+                print("Incorrect.")
+
             # resset currentGameState
+            pass
 
 
         # display recognized gesture on screen
@@ -117,7 +152,8 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
         fontScale = 1
         color = (255, 0, 0) 
         thickness = 2
-        image = cv.putText(frame, currentGameState + '\t' + title, org, cv.FONT_HERSHEY_SIMPLEX ,  
+        outText = currentGameState + '    ' + title
+        image = cv.putText(frame, outText, org, cv.FONT_HERSHEY_SIMPLEX ,  
                         fontScale, color, thickness, cv.LINE_AA) 
 
         cv.imshow('camera', image)
