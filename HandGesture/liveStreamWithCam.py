@@ -7,7 +7,7 @@ import threading
 import json
 import requests
 
-
+API_URL = "https://opentdb.com/api.php?amount=10&difficulty=easy&type=boolean"
 
 
 def current_milli_time():
@@ -63,9 +63,15 @@ options = GestureRecognizerOptions(
     result_callback=print_result)
 with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.Holistic(min_detection_confidence = .5, min_tracking_confidence=.5) as holistic:
     
+    # state and game state variables
+    currentGestureStateCount = 0
+    previousGestureState = ''
+    previousGameState = 'Main'
+    currentGameState = 'Main'
+    showMesh = True
+
     cam = cv.VideoCapture(0)
-    currentStateCount = 0
-    previousState = ''
+    
     while True:
         # Capture frame-by-frame
         ret, frame = cam.read()
@@ -75,7 +81,8 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
             break
             
         getGesture(recognizer=recognizer, frame=frame)
-        printHandOutline(holisitic=holistic, frame=frame)
+        if showMesh:
+            printHandOutline(holisitic=holistic, frame=frame)
 
 
         if(globalResult is not None and len(globalResult.gestures) != 0):
@@ -87,19 +94,30 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
         if top_gesture:
             title = f"{top_gesture.category_name} ({top_gesture.score:.2f})"
         
-        if title != '' and previousState != title:
+        if title != '' and previousGestureState != title:
             #make sure it is the right option
-            currentStateCount = currentStateCount + 1
-            if(currentStateCount == 30):
-                currentStateCount = 0
-                previousState = title
+            currentGestureStateCount = currentGestureStateCount + 1
+            if(currentGestureStateCount == 30):
+                currentGestureStateCount = 0
+                previousGestureState = title
+                if 'Pointing_Up' in title:
+                    showMesh = not showMesh
+                if 'I_Love_You' in title:
+                    currentGameState = 'play'
+
+        #game logic
+        (if currentGameState is 'main' and previousGameState is 'play')
+        if(currentGameState is 'play'):
+            # ask a question
+            # resset currentGameState
+
 
         # display recognized gesture on screen
         org = (50, 50) 
         fontScale = 1
         color = (255, 0, 0) 
         thickness = 2
-        image = cv.putText(frame, 'state: ' + previousState + '\n' + title, org, cv.FONT_HERSHEY_SIMPLEX ,  
+        image = cv.putText(frame, currentGameState + '\t' + title, org, cv.FONT_HERSHEY_SIMPLEX ,  
                         fontScale, color, thickness, cv.LINE_AA) 
 
         cv.imshow('camera', image)
