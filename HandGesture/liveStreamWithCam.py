@@ -21,8 +21,8 @@ VisionRunningMode = mp.tasks.vision.RunningMode
 mp_holistic = mp.solutions.holistic
 mp_drawing = mp.solutions.drawing_utils
 
-bottom_text = "          holder"
-mid_text = "Correct"
+bottom_text = "Gesture to Start!" # bottom holder
+mid_text = ""
 
 globalResult = None
 # Create a gesture recognizer instance with the live stream mode:
@@ -78,6 +78,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
     questionNumber = 0
     midQuestion = False
     correct_answers = 0
+    response_text_timer = 0
     
 
     #set up trivia variables
@@ -159,26 +160,35 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
         if midQuestion:
             if 'Thumb_Up' in currentGestureState:
                 user_answer = 'True'
-                print('You said True')
+                print('You answered True')
                 if user_answer == question["correct_answer"]:
-                    print("Correct!")
+                    mid_text = "Correct!"
                     correct_answers += 1
+                    response_text_timer = 20
                 else:
-                    print("Incorrect.")
+                    mid_text = "Incorrect."
+                    response_text_timer = 20
                 midQuestion = False
                 currentGestureState = ''
                 currentGestureStateCount = 0 # to let state reset
             if 'Thumb_Down' in currentGestureState:
                 user_answer = 'False'
-                print('You said False')
+                print('You answered False')
                 if user_answer == question["correct_answer"]:
-                    print("Correct!")
+                    mid_text = "Correct!"
                     correct_answers += 1
+                    response_text_timer = 20
                 else:
-                    print("Incorrect.")
+                    mid_text = "Incorrect."
+                    response_text_timer = 20
                 midQuestion = False
                 currentGestureState = ''
                 currentGestureStateCount = 0 # to let state reset
+
+        if(response_text_timer > 0):
+            response_text_timer = response_text_timer - 1
+        else:
+            mid_text = ''
 
         
         #flipping the camera feed
