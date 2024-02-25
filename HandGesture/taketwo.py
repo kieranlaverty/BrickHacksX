@@ -1,5 +1,7 @@
 import threading
 
+import dance_pose
+
 import cv2 as cv
 
 import mediapipe as mp
@@ -50,16 +52,15 @@ def pose():
    
    
     with mp_holistic.Holistic(min_detection_confidence = .5, min_tracking_confidence=.5) as holistic:
-        count = 10
-        current_gesture = None
+
         while True:
          
             # Capture frame-by-frame
             ret, frame = cam.read()
             gesture = gest(frame)
             #scaled the image by 2
-            height, width = frame.shape[:2]
-            frame = cv.resize(frame,(2*width, 2*height), interpolation = cv.INTER_CUBIC)
+            #height, width = frame.shape[:2]
+            #frame = cv.resize(frame,(2*width, 2*height), interpolation = cv.INTER_CUBIC)
                 
             # if frame is read correctly ret is True
             if not ret:
@@ -96,45 +97,24 @@ def pose():
          
 
             img = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
-
-            """if not (result.right_hand_landmarks == None):
-                x = result.right_hand_landmarks.landmark[9].x
-                y = result.right_hand_landmarks.landmark[9].y
-                if x > .50:
-                print("right")
-                else:
-                print("no") """
             
-            if not (result.right_hand_landmarks == None):
-                x = result.right_hand_landmarks.landmark[9].x
-                y = result.right_hand_landmarks.landmark[9].y
-                if x > .50:
-                    print("right")
-                else:
-                    print("no")
-                
-            try:
-                if not type(gesture) == None:
-                    if (not gesture[0:3] == None) or count ==0:
-                        current_gesture = gesture[0:3]
-                    if (current_gesture == gesture[0:3]) and count < 10:
-                        count = count + 1
-                    if not (current_gesture == gesture[0:3]):
-                        count = count - 1
-                else:
-                    if not count == 0:
-                        count = count -1
-            except:
-                pass
+            left = result.left_hand_landmarks 
+            right = result.right_hand_landmarks
+
+
+            
+            dance_pose.reverse_t_pose(result.left_hand_landmarks ,result.right_hand_landmarks)
+            
+            dance_pose.t_pose(result.left_hand_landmarks ,result.right_hand_landmarks)
+
+            dance_pose.superman_pose(result.left_hand_landmarks ,result.right_hand_landmarks)
 
             # Window name in which image is displayed 
             window_name = 'Image'
             
             # text 
-            if current_gesture == None:
-                text = "None"
-            else:
-                text = current_gesture
+
+            text = gesture
             
             # font 
             font = cv.FONT_HERSHEY_SIMPLEX 
@@ -151,13 +131,14 @@ def pose():
             # Line thickness of 2 px 
             thickness = 2
             
-            # Using cv2.putText() method 
-            newframe = cv.putText(frame, text, org, font, fontScale,  
-                            color, thickness, cv.LINE_AA, False) 
+             
     
-         
+            newframe = cv.flip(frame, 1 )
 
-            cv.imshow('frame', newframe)
+            # Using cv2.putText() method 
+            corrected = cv.putText(newframe, text, org, font, fontScale,  
+                            color, thickness, cv.LINE_AA, False)
+            cv.imshow('frame', corrected)
 
 
             
