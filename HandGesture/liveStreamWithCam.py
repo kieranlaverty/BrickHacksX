@@ -66,12 +66,19 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
     
     # state and game state variables
     currentGestureStateCount = 0
-    previousGestureState = ''
+    #previousGestureState = ''
+    currentGestureState = ''
     previousGameState = 'Main'
     currentGameState = 'Main'
     loadQuestions = True
     showMesh = True
     questionNumber = 0
+    midQuestion = False
+
+    #set up trivia variables
+    response = requests.get(API_URL)
+    data = json.loads(response.text)
+    questions = data["results"]
 
     cam = cv.VideoCapture(0)
     
@@ -98,18 +105,21 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
             title = f"{top_gesture.category_name} ({top_gesture.score:.2f})"
         
         #get current Gesture
-        if title != '' and previousGestureState != title:
+        if title != '' and currentGestureState != title:
             #make sure it is the right option
             currentGestureStateCount = currentGestureStateCount + 1
             if(currentGestureStateCount == 30):
                 currentGestureStateCount = 0
-                previousGestureState = title
+                current = title
                 if 'Pointing_Up' in title:
                     showMesh = not showMesh
                 if 'ILoveYou' in title:
                     currentGameState = 'play'
                 if 'Victory' in title:
                     currentGameState = 'main'
+                    loadQuestions = True
+                    questionNumber = 0
+                    midQuestion = False
 
         #game logic
         if currentGameState == 'main' and loadQuestions == True:
@@ -121,30 +131,45 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
             loadQuestions = False
             questionNumber = 0
             correct_answers = 0
-            questions = data["results"]
 
+        if(questionNumber == 10):
+            #print high score
+            continue
 
-        if(currentGameState is 'play'):
+        if(currentGameState == 'play' and not midQuestion and questionNumber < 10):
+            midQuestion = True
             loadQuestions = True
             # ask a question
             question = questions[questionNumber]
             print(question["question"])
             print("Options:")
+            gestureChoices = {0: "thumbs-down", 1: "thumbs-up"}
             for i in range(len(question["incorrect_answers"])):
-                print(f"{i+1}. {question['incorrect_answers'][i]}")
+                print(f"({gestureChoices[i]}) {question['incorrect_answers'][i]}")
 
-            # print(f"(Thumbs-up): {question['incorrect_answers'][0]}")
-            # print(f"(Thumbs-down): {question['incorrect_answers'][1]}")
             print(f"{len(question['incorrect_answers'])+1}. {question['correct_answer']}")
-            user_answer = int(input("Enter the number of your answer: "))
-            if user_answer == len(question["incorrect_answers"]) + 1:
-                print("Correct!")
-                correct_answers += 1
-            else:
-                print("Incorrect.")
+            questionNumber = questionNumber + 1
 
             # resset currentGameState
             pass
+
+        if midQuestion:
+            if 'Thumb_Up' in currentGestureState:
+                user_answer = 2
+                if user_answer == len(question["incorrect_answers"]) + 1:
+                    print("Correct!")
+                    correct_answers += 1
+                else:
+                    print("Incorrect.")
+                midQuestion = False
+            if 'Thumb_Down' in currentGestureState:
+                user_answer = 1
+                if user_answer == len(question["incorrect_answers"]) + 1:
+                    print("Correct!")
+                    correct_answers += 1
+                else:
+                    print("Incorrect.")
+                midQuestion = False
 
 
         # display recognized gesture on screen
@@ -152,7 +177,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
         fontScale = 1
         color = (255, 0, 0) 
         thickness = 2
-        outText = currentGameState + '    ' + title
+        outText = currentGameState + '    ' + currentGestureState
         image = cv.putText(frame, outText, org, cv.FONT_HERSHEY_SIMPLEX ,  
                         fontScale, color, thickness, cv.LINE_AA) 
         
