@@ -75,7 +75,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
             break
             
         getGesture(recognizer=recognizer, frame=frame)
-        #printHandOutline(holisitic=holistic, frame=frame)
+        printHandOutline(holisitic=holistic, frame=frame)
 
 
         if(globalResult is not None and len(globalResult.gestures) != 0):
