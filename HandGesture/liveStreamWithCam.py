@@ -230,7 +230,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
         
         #overlay text
         image = cv.putText(image, mid_text, (200,250), cv.FONT_HERSHEY_SIMPLEX ,  
-                        fontScale, color, thickness, cv.LINE_AA)
+                        1, color, thickness, cv.LINE_AA)
 
         #scaled the image by 2
         height, width = image.shape[:2]
