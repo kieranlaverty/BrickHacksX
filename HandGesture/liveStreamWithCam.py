@@ -74,6 +74,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
     showMesh = True
     questionNumber = 0
     midQuestion = False
+    correct_answers = 0
 
     #set up trivia variables
     response = requests.get(API_URL)
@@ -110,7 +111,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
             currentGestureStateCount = currentGestureStateCount + 1
             if(currentGestureStateCount == 30):
                 currentGestureStateCount = 0
-                current = title
+                currentGestureState = title
                 if 'Pointing_Up' in title:
                     showMesh = not showMesh
                 if 'ILoveYou' in title:
@@ -120,6 +121,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
                     loadQuestions = True
                     questionNumber = 0
                     midQuestion = False
+                    correct_answers = 0
 
         #game logic
         if currentGameState == 'main' and loadQuestions == True:
@@ -147,7 +149,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
             for i in range(len(question["incorrect_answers"])):
                 print(f"({gestureChoices[i]}) {question['incorrect_answers'][i]}")
 
-            print(f"{len(question['incorrect_answers'])+1}. {question['correct_answer']}")
+            #print(f"{len(question['incorrect_answers'])+1}. {question['correct_answer']}")
             questionNumber = questionNumber + 1
 
             # resset currentGameState
@@ -162,6 +164,8 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
                 else:
                     print("Incorrect.")
                 midQuestion = False
+                currentGestureState = ''
+                currentGestureStateCount = -50 # to let state reset
             if 'Thumb_Down' in currentGestureState:
                 user_answer = 1
                 if user_answer == len(question["incorrect_answers"]) + 1:
@@ -170,6 +174,8 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
                 else:
                     print("Incorrect.")
                 midQuestion = False
+                currentGestureState = ''
+                currentGestureStateCount = -50 # to let state reset
 
         
         #flipping the camera feed
@@ -181,7 +187,7 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
         fontScale = 1
         color = (255, 0, 0) 
         thickness = 2
-        outText = currentGameState + '    ' + currentGestureState
+        outText = 'game: ' + currentGameState + '    controlState:' + currentGestureState +  'current: ' + title
         image = cv.putText(frame, outText, org, cv.FONT_HERSHEY_SIMPLEX ,  
                         fontScale, color, thickness, cv.LINE_AA) 
         
