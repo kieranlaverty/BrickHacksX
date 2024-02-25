@@ -1,13 +1,39 @@
-import numpy as np
+import threading
+
 import cv2 as cv
+
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
+from mediapipe.framework.formats import landmark_pb2
+
+base_options = python.BaseOptions(model_asset_path='HandGesture\\gesture_recognizer.task')
+options = vision.GestureRecognizerOptions(base_options=base_options)
+recognizer = vision.GestureRecognizer.create_from_options(options)
 
 
-def main():
+def gest(frame):
+        
+        
+    rgb_frame = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
+
+    recognition_result = recognizer.recognize(rgb_frame)
+
+    try:
+        top_gesture = recognition_result.gestures[0][0]
+    except IndexError:
+
+        top_gesture = None
+
+    hand_landmarks = recognition_result.hand_landmarks
+
+    if top_gesture:
+        title = f"{top_gesture.category_name} ({top_gesture.score:.2f})"
+        print(title)
 
 
+
+def pose():
    mp_hands = mp.solutions.hands
    hand = mp_hands.Hands()
 
@@ -28,7 +54,7 @@ def main():
          
          # Capture frame-by-frame
          ret, frame = cam.read()
-
+         gest(frame)
          #scaled the image by 2
          height, width = frame.shape[:2]
          frame = cv.resize(frame,(2*width, 2*height), interpolation = cv.INTER_CUBIC)
@@ -101,6 +127,22 @@ def main():
 
 
 
+def main():
+    pose()
+    """ t1 = threading.Thread(pose())
+    t2 = threading.Thread(gest())
+
+    t1.start()
+    t2.start()
+
+    t1.join()
+    t2.join() """
+
+
+
+
+
 
 if __name__ == "__main__":
    main()
+
