@@ -22,6 +22,7 @@ mp_holistic = mp.solutions.holistic
 mp_drawing = mp.solutions.drawing_utils
 
 bottom_text = "          holder"
+mid_text = "Correct"
 
 globalResult = None
 # Create a gesture recognizer instance with the live stream mode:
@@ -214,6 +215,9 @@ with GestureRecognizer.create_from_options(options) as recognizer, mp_holistic.H
         image = cv.putText(frame, bottom_text, org, cv.FONT_HERSHEY_SIMPLEX ,  
                         fontScale, color, thickness, cv.LINE_AA)
         
+        #overlay text
+        image = cv.putText(image, mid_text, (200,250), cv.FONT_HERSHEY_SIMPLEX ,  
+                        fontScale, color, thickness, cv.LINE_AA)
 
         #scaled the image by 2
         height, width = image.shape[:2]
